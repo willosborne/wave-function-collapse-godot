@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://WFC.cs" type="Script" id=1]
+[ext_resource path="res://ModuleSet.tscn" type="PackedScene" id=2]
+
+[node name="WFC" type="Spatial"]
+script = ExtResource( 1 )
+gridWidth = 5
+gridHeight = 5
+
+[node name="ModuleSet" parent="." instance=ExtResource( 2 )]
