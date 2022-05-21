@@ -14,3 +14,7 @@ gridDepth = 15
 
 [node name="FirstPersonCamera" parent="." instance=ExtResource( 2 )]
 transform = Transform( -1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.94856, 0 )
+
+[node name="DirectionalLight" type="DirectionalLight" parent="."]
+transform = Transform( 0.617764, -0.43242, 0.656796, 0, 0.835232, 0.549898, -0.786364, -0.339707, 0.515976, 0, 0, 0 )
+shadow_enabled = true

@@ -62,6 +62,14 @@ public class FirstPersonCamera : Spatial
             // moveDir += GlobalTransform.basis.x;
             moveDir += Vector3.Right;
         }   
+        if (Input.IsActionPressed("fly_up")) {
+            // moveDir += GlobalTransform.basis.x;
+            moveDir += Vector3.Up;
+        }   
+        if (Input.IsActionPressed("fly_down")) {
+            // moveDir += GlobalTransform.basis.x;
+            moveDir += Vector3.Down;
+        }   
         return moveDir.Normalized();
     }
 }

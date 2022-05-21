@@ -32,6 +32,8 @@ public class WFC : Spatial
 
     PackedScene debugSphereScene = Godot.ResourceLoader.Load("res://DebugSphere.tscn") as PackedScene;
 
+    List<Node> meshes = new List<Node>();
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
@@ -41,6 +43,15 @@ public class WFC : Spatial
         moduleSet.LoadModules(absFilename);
 
         Console.WriteLine(string.Join(",", moduleSet.modules.Keys));
+        initialiseGrid();
+    }
+
+    public void Reset() {
+        foreach (Node node in meshes) {
+            RemoveChild(node);
+            node.QueueFree();
+        }
+        meshes.Clear();
         initialiseGrid();
     }
 
@@ -70,7 +81,7 @@ public class WFC : Spatial
                 }
             }
         }
-        eliminateBorders();
+        // eliminateBorders();
     }
 
     void eliminateBorders()
@@ -94,7 +105,6 @@ public class WFC : Spatial
 
     public bool IsCollapsed()
     {
-        bool isCollapsed = true;
         for (int x = 0; x < gridWidth; x++)
         {
             for (int y = 0; y < gridHeight; y++)
@@ -103,23 +113,52 @@ public class WFC : Spatial
                 {
                     if (grid[x, y, z].Count > 1)
                     {
-                        isCollapsed = false;
+                        return false;
                     }
                 }
             }
         }
-        return isCollapsed;
+        return true;
+    }
+
+    public bool isStuck() {
+        for (int x = 0; x < gridWidth; x++)
+        {
+            for (int y = 0; y < gridHeight; y++)
+            {
+                for (int z = 0; z < gridDepth; z++)
+                {
+                    if (grid[x, y, z].Count == 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public void Run() {
+        while (!IsCollapsed()) {
+            Iterate();
+        }
     }
 
     public void Iterate()
     {
+        if (isStuck()) {
+            Reset();
+        }
         if (IsCollapsed()) {
             return;
         }
         Vector3 lowestPoint = findLowestEntropy();
         collapse(lowestPoint);
 
-        moduleSet.InstanceModule(getModules(lowestPoint)[0], lowestPoint * gridSize);
+        Spatial spatial = moduleSet.InstanceModule(getModules(lowestPoint)[0], lowestPoint * gridSize);
+        if (spatial != null) {
+            meshes.Add(spatial);
+        }
 
         propagate(lowestPoint);
     }
@@ -130,13 +169,13 @@ public class WFC : Spatial
         int y = (int)pos.y;
         int z = (int)pos.z;
 
-        Console.WriteLine($"Collapsing tile at [{x}, {y}, {z}]...");
-        Console.WriteLine(string.Join(",", grid[x, y, z]));
+        // Console.WriteLine($"Collapsing tile at [{x}, {y}, {z}]...");
+        // Console.WriteLine(string.Join(",", grid[x, y, z]));
 
         string elem = grid[x, y, z][random.Next(grid[x, y, z].Count)];
         grid[x, y, z].Clear();
         grid[x, y, z].Add(elem);
-        Console.WriteLine($"Collapsed tile at [{x}, {y}, {z}] to module {elem}");
+        // Console.WriteLine($"Collapsed tile at [{x}, {y}, {z}] to module {elem}");
 
         if (ShowDebugSpheres)
         {
@@ -178,19 +217,19 @@ public class WFC : Spatial
 
     void propagate(Vector3 pos)
     {
-        Console.WriteLine("yeet");
+        // Console.WriteLine("yeet");
         // bool modified = false;
         propagateStack.Push(pos);
 
         while (propagateStack.Count != 0)
         {
             Vector3 val = propagateStack.Pop();
-            Console.WriteLine($"Propagating tile at {val}, stack size {propagateStack.Count}");
+            // Console.WriteLine($"Propagating tile at {val}, stack size {propagateStack.Count}");
             foreach (Vector3 direction in getPossibleDirections(pos))
             {
                 Vector3 otherCoords = pos + direction;
 
-                Console.WriteLine($"Constraining {otherCoords}");
+                // Console.WriteLine($"Constraining {otherCoords}");
                 List<string> other = getModules(otherCoords);
 
                 List<string> validModules = getValidModules(pos, direction);

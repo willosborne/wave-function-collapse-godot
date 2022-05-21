@@ -55,10 +55,10 @@ public class ModuleSet : Spatial {
         return ResourceLoader.Load(filename) as PackedScene;
     }
 
-    public void InstanceModule(string moduleName, Vector3 position)
+    public Spatial InstanceModule(string moduleName, Vector3 position)
     {
         if (moduleName == "empty") {
-            return;
+            return null;
         }
         Module module = modules[moduleName];
         PackedScene scene = moduleScenes[moduleName];
@@ -71,5 +71,6 @@ public class ModuleSet : Spatial {
         instance.RotateY(Godot.Mathf.Deg2Rad(module.Rotation * 90));
 
         AddChild(instance);
+        return instance;
     }
 }

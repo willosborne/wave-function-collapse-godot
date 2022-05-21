@@ -19,7 +19,9 @@ public class Demo : Spatial
     public override void _Process(float delta)
     {
         if (Input.IsActionPressed("ui_accept")) {
-            wfc.Iterate();
+            for (int i = 0; i < 5; i++)
+                wfc.Iterate();
         }
+        // wfc.Run();
     }
 }
